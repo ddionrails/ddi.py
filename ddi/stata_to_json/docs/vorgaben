@@ -1,0 +1,94 @@
+"<variable>": {
+    "study": "",
+    "name": "",
+    "name_cs": "",
+    "variable": "",
+    "dataset": "",
+    "label": "",
+    "label_de": "",
+    "scale": "",
+    "analysis_unit": "",
+    "sub_type": "",
+    "boost": "",
+    "period": ""
+}
+
+Wenn "scale": "cat"
+
+    "categories": {
+      "frequencies": [],
+      "labels": [],
+      "missings": [],
+      "values": [],
+      "labels_de": []
+    },
+    "statistics": {
+      "names": [
+        "valid",
+        "invalid"
+      ],
+      "values": [
+        "",
+        ""
+      ]
+    },
+    
+Wenn "scale": " "" --> number
+
+    "categories": {
+      "frequencies": [],
+      "labels": [],
+      "missings": [],
+      "values": [],
+      "labels_de": []
+    },
+    "statistics": {
+      "names": [
+        "Min.",
+        "1st Qu.",
+        "Median",
+        "Mean",
+        "3rd Qu.",
+        "Max.",
+        "NA's",
+        "valid",
+        "invalid"
+      ],
+      "values": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+
+Wenn "scale": "" --> string
+    
+    "categories": {
+      "frequencies": [],
+      "labels": [],
+      "missings": [],
+      "values": [],
+      "labels_de": []
+    },
+    "statistics": {
+      "names": [
+        "valid",
+        "invalid"
+      ],
+      "values": [
+        "624763",
+        "0"
+      ]
+    },
+    
+p2 --> pa* --> string
+
+pandas iterator = True
+
+x = pd.read_stata("./ahbrutto.dta", convert_categoricals=False, iterator=True)
