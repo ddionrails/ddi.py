@@ -1,3 +1,3 @@
-filename,analysis_unit,period,sub_type
-ahbrutto,h,2016,org/net
-ah-raw,h,2016,org/net
+filename,analysis_unit,period,sub_type,boost
+ahbrutto,h,2016,org/net,1
+ah-raw,h,2016,org/net,1

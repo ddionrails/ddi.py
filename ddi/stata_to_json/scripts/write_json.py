@@ -31,9 +31,9 @@ def uni_cat(elem, elem_de, file_csv):
             labels.append(value["label"])
             labels_de.append(value_de["label"])
             if value["value"] >= 0:
-                missings.append("False")
+                missings.append("false")
             else:
-                missings.append("True")
+                missings.append("true")
             values.append(value["value"])
     else:
         value_count = file_csv[elem["name"]].value_counts()
@@ -44,9 +44,9 @@ def uni_cat(elem, elem_de, file_csv):
                 frequencies.append(0)
             labels.append(value["label"])
             if value["value"] >= 0:
-                missings.append("False")
+                missings.append("false")
             else:
-                missings.append("True")
+                missings.append("true")
             values.append(value["value"])
     """
     missing_count = sum(i<0 for i in file_csv[elem["name"]])
@@ -69,28 +69,13 @@ def uni_cat(elem, elem_de, file_csv):
 def uni_string(elem, file_csv):
     """Generate dict with frequencies for nominal variables"""
 
-    frequencies = []
-    missings = []
-
-    len_unique = len(file_csv[elem["name"]].unique())
-    len_missing = 0
-    for i in file_csv[elem["name"]].unique():
-        if "-1" in str(i):
-            len_unique -= 1
-            len_missing += 1
-        elif "-2" in str(i):
-            len_unique -= 1
-            len_missing += 1
-        elif "-3" in str(i):
-            len_unique -= 1
-            len_missing += 1
-        elif "nan" in str(i):
-            len_unique -= 1
-            len_missing += 1
-    frequencies.append(len_unique)
-    missings.append(len_missing)
-
-    string_dict = OrderedDict([("frequencies", frequencies), ("missings", missings)])
+    string_dict = OrderedDict()
+    
+    string_dict["frequencies"]= []
+    string_dict["labels"]= []
+    string_dict["missings"]= []
+    string_dict["values"]= []
+    string_dict["labels_de"]= []
 
     return string_dict
 
@@ -98,78 +83,13 @@ def uni_string(elem, file_csv):
 def uni_number(elem, file_csv, num_density_elements=20):
     """Generate dict with frequencies for numerical variables"""
 
-    if (
-        file_csv[elem["name"]].dtype == "object"
-        or file_csv[elem["name"]].dtype == "object"
-    ):
-        file_csv[elem["name"]] = pd.to_numeric(file_csv[elem["name"]])
-
-    # missings
-    missings = OrderedDict([("frequencies", []), ("labels", []), ("values", [])])
-
-    density = []
-    total = []
-    valid = []
-    missing = []
-
-    # min and max
-    try:
-        min_val = min(i for i in file_csv[elem["name"]] if i >= 0).astype(np.float64)
-        max_val = max(i for i in file_csv[elem["name"]] if i >= 0).astype(np.float64)
-
-        # density
-        temp_array = []
-        for num in file_csv[elem["name"]]:
-            if num >= 0:
-                temp_array.append(float(num))
-        density_range = np.linspace(min_val, max_val, num_density_elements)
-        try:
-            density_temp = gaussian_kde(sorted(temp_array)).evaluate(density_range)
-            by = float(density_range[1] - density_range[0])
-            density = density_temp.tolist()
-        except:
-            by = 0
-            density = []
-
-        # tranform to percentage
-        """
-        x = sum(density)
-        for i, c in enumerate(density):
-            density[i] = density[i]/x
-        """
-
-    except:
-        min_val = []
-        max_val = []
-        by = 0
-        density = []
-
-    # missings
-    for i in file_csv[elem["name"]].unique():
-        if i < 0:
-            missings["frequencies"].append(
-                file_csv[elem["name"]].value_counts()[i].astype(np.float64)
-            )
-            missings["values"].append(float(i))
-            # missings["labels"].append.... # there are no labels for missings in numeric variables
-    missing.append(sum(missings["frequencies"]))
-
-    # total and valid
-    total = int(file_csv[elem["name"]].size)
-    valid = total - int(file_csv[elem["name"]].isnull().sum())
-
-    number_dict = OrderedDict(
-        [
-            ("density", density),
-            ("min", min_val),
-            ("max", max_val),
-            ("by", by),
-            ("total", total),
-            ("valid", valid),
-            ("missing", missing),
-            ("num_missings", missings),
-        ]
-    )
+    number_dict = OrderedDict()
+    
+    number_dict["frequencies"]= []
+    number_dict["labels"]= []
+    number_dict["missings"]= []
+    number_dict["values"]= []
+    number_dict["labels_de"]= []
 
     return number_dict
 
@@ -179,16 +99,14 @@ def stats_cat(elem, file_csv):
 
     data_wm = file_csv[file_csv[elem["name"]] >= 0][elem["name"]]
 
-    names = ["Median", "Valid", "Invalid"]
+    names = ["valid", "invalid"]
     values = []
-
-    median = np.median(data_wm)
 
     total = int(file_csv[elem["name"]].size)
     valid = total - int(file_csv[elem["name"]].isnull().sum())
     invalid = int(file_csv[elem["name"]].isnull().sum())
 
-    value_names = [median, valid, invalid]
+    value_names = [valid, invalid]
 
     for v in value_names:
         values.append(str(v))
@@ -201,7 +119,7 @@ def stats_cat(elem, file_csv):
 def stats_string(elem, file_csv):
     """Generate dict with statistics for nominal variables"""
 
-    names = ["Valid", "Invalid"]
+    names = ["valid", "invalid"]
     values = []
 
     total = int(file_csv[elem["name"]].size)
@@ -227,7 +145,7 @@ def stats_number(elem, file_csv):
 
     data_wm = file_csv[file_csv[elem["name"]] >= 0][elem["name"]]
 
-    names = ["Min.", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max.", "Valid", "Invalid"]
+    names = ["Min.", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max.", "valid", "invalid"]
     values = []
 
     min_val = min(data_wm)
@@ -343,15 +261,16 @@ def stat_dict(
     try:
         stat_dict["boost"] = file_json["boost"]
     except:
-        pass
+        stat_dict["boost"] = ""
+    
+    
     stat_dict["dataset"] = file_json["name"].lower()
-    stat_dict["dataset_cs"] = file_json["name"]
-    stat_dict["variable"] = elem["name"]
+    stat_dict["variable"] = elem["name"].lower()
     stat_dict["name"] = elem["name"].lower()
     stat_dict["name_cs"] = elem["name"]
     stat_dict["label"] = elem["label"]
     stat_dict["scale"] = scale
-    stat_dict["uni"] = uni(elem, elem_de, file_csv)
+    stat_dict["categories"] = uni(elem, elem_de, file_csv)
 
     # For 10 or less values the statistics aren't shown.
 
@@ -379,7 +298,7 @@ def generate_stat(
 ):
     """Prepare statistics for every variable"""
 
-    stat = []
+    stat = OrderedDict()
     if metadata_de != "":
         elements = zip(
             metadata["resources"][0]["schema"]["fields"],
@@ -390,9 +309,9 @@ def generate_stat(
         for elem in metadata["resources"][0]["schema"]["fields"]:
             elements.append((elem, ""))
     for elem, elem_de in elements:
+        varname = elem["name"].lower()
         try:
-            stat.append(
-                stat_dict(
+            stat[varname] = stat_dict(
                     elem,
                     elem_de,
                     data,
@@ -403,9 +322,9 @@ def generate_stat(
                     sub_type,
                     study
                 )
-            )
-        except:
-            pass
+        except Exception as e:
+            print(e.message, e.args)
+    
     return stat
 
 
