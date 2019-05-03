@@ -18,6 +18,8 @@ def uni_cat(elem, elem_de, file_csv):
     values = []
     missings = []
     labels = []
+	
+    stata_missings = {4294967290: -6, 4294967291: -5, 4294967292: -4, 4294967293: -3, 4294967294: -2, 4294967295: -1}
 
     if elem_de != "":
         labels_de = []
@@ -30,11 +32,13 @@ def uni_cat(elem, elem_de, file_csv):
                 frequencies.append(0)
             labels.append(value["label"])
             labels_de.append(value_de["label"])
-            if value["value"] >= 0:
+
+            if value["value"] >= 0 and value["value"] not in stata_missings:
                 missings.append("false")
+                values.append(value["value"])
             else:
                 missings.append("true")
-            values.append(value["value"])
+                values.append(stata_missings[value["value"]])
     else:
         value_count = file_csv[elem["name"]].value_counts()
         for i, value in enumerate(elem["values"]):
@@ -43,11 +47,12 @@ def uni_cat(elem, elem_de, file_csv):
             except:
                 frequencies.append(0)
             labels.append(value["label"])
-            if value["value"] >= 0:
+            if value["value"] >= 0 and value["value"] not in stata_missings:
                 missings.append("false")
+                values.append(value["value"])
             else:
                 missings.append("true")
-            values.append(value["value"])
+                values.append(stata_missings[value["value"]])
     """
     missing_count = sum(i<0 for i in file_csv[elem["name"]])
     """
