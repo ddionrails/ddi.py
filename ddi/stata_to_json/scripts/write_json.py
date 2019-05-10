@@ -232,6 +232,7 @@ def stat_dict(
     analysis_unit,
     period,
     sub_type,
+    boost,
     study
 ):
     """Fill variables with metadata of the dataset."""
@@ -243,32 +244,11 @@ def stat_dict(
 
     stat_dict = OrderedDict()
 
-    try:
-        stat_dict["study"] = file_json["study"]
-    except:
-        stat_dict["study"] = study
-    try:
-        stat_dict["analysis_unit"] = file_json["analysis_unit"]
-    except:
-        stat_dict["analysis_unit"] = analysis_unit
-    try:
-        stat_dict["period"] = file_json["period"]
-    except:
-        stat_dict["period"] = str(period)
-    try:
-        stat_dict["conceptual_dataset"] = file_json["conceptual_dataset"]
-    except:
-        pass
-    try:
-        stat_dict["sub_type"] = file_json["sub_type"]
-    except:
-        stat_dict["sub_type"] = sub_type
-    try:
-        stat_dict["boost"] = file_json["boost"]
-    except:
-        stat_dict["boost"] = ""
-    
-    
+    stat_dict["study"] = study
+    stat_dict["analysis_unit"] = analysis_unit
+    stat_dict["period"] = str(period)
+    stat_dict["sub_type"] = sub_type
+    stat_dict["boost"] = boost
     stat_dict["dataset"] = file_json["name"].lower()
     stat_dict["variable"] = elem["name"].lower()
     stat_dict["name"] = elem["name"].lower()
@@ -299,6 +279,7 @@ def generate_stat(
     analysis_unit,
     period,
     sub_type,
+    boost,
     study
 ):
     """Prepare statistics for every variable"""
@@ -325,6 +306,7 @@ def generate_stat(
                     analysis_unit,
                     period,
                     sub_type,
+                    boost,
                     study
                 )
         except Exception as e:
@@ -342,6 +324,7 @@ def write_json(
     analysis_unit="",
     period="",
     sub_type="",
+    boost="",
     study="",
     metadata_de=""
 ):
@@ -352,6 +335,7 @@ def write_json(
         analysis_unit,
         period,
         sub_type,
+        boost,
         study
     )
     

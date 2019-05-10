@@ -10,11 +10,12 @@ def stata_to_json(
 ):
     filereader = pd.read_csv(input_csv, delimiter=",", header=0)
 
-    for data, analysis_unit, period, sub_type in zip(
+    for data, analysis_unit, period, sub_type, boost in zip(
         filereader.filename,
         filereader.analysis_unit,
         filereader.period,
         filereader.sub_type,
+        filereader.boost,
     ):
         d1 = Dataset()
         try:
@@ -40,6 +41,7 @@ def stata_to_json(
             analysis_unit=analysis_unit,
             period=period,
             sub_type=sub_type,
+            boost=str(boost),
             study=study_name,
             metadata_de=metadata_de,
         )

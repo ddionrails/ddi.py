@@ -39,6 +39,7 @@ class Dataset:
         analysis_unit="",
         period="",
         sub_type="",
+        boost="",
         study="",
         metadata_de=""
     ):
@@ -63,6 +64,7 @@ class Dataset:
             analysis_unit=analysis_unit,
             period=period,
             sub_type=sub_type,
+            boost=boost,
             study=study,
             metadata_de=metadata_de
         )
