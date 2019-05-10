@@ -19,7 +19,7 @@ def uni_cat(elem, elem_de, file_csv):
     missings = []
     labels = []
 	
-    stata_missings = {4294967290: -6, 4294967291: -5, 4294967292: -4, 4294967293: -3, 4294967294: -2, 4294967295: -1}
+    stata_missings = {"4294967287": "-9", "4294967288": "-8", "4294967289": "-7", "4294967290": "-6", "4294967291": "-5", "4294967292": "-4", "4294967293": "-3", "4294967294": "-2", "4294967295": "-1"}
 
     if elem_de != "":
         labels_de = []
@@ -33,12 +33,17 @@ def uni_cat(elem, elem_de, file_csv):
             labels.append(value["label"])
             labels_de.append(value_de["label"])
 
-            if value["value"] >= 0 and value["value"] not in stata_missings:
+            var_value = str(value["value"])
+
+            if int(var_value) >= 0 and var_value not in stata_missings:
                 missings.append("false")
-                values.append(value["value"])
+                values.append(var_value)
             else:
                 missings.append("true")
-                values.append(stata_missings[value["value"]])
+                if var_value in stata_missings:
+                    values.append(stata_missings[var_value])
+                else:
+                    values.append(var_value)
     else:
         value_count = file_csv[elem["name"]].value_counts()
         for i, value in enumerate(elem["values"]):
@@ -47,12 +52,18 @@ def uni_cat(elem, elem_de, file_csv):
             except:
                 frequencies.append(0)
             labels.append(value["label"])
-            if value["value"] >= 0 and value["value"] not in stata_missings:
+
+            var_value = str(value["value"])
+
+            if int(value["value"]) >= 0 and var_value not in stata_missings:
                 missings.append("false")
-                values.append(value["value"])
+                values.append(var_value)
             else:
                 missings.append("true")
-                values.append(stata_missings[value["value"]])
+                if var_value in stata_missings:
+                    values.append(stata_missings[var_value])
+                else:
+                    values.append(var_value)
     """
     missing_count = sum(i<0 for i in file_csv[elem["name"]])
     """
@@ -290,11 +301,16 @@ def generate_stat(
             metadata["resources"][0]["schema"]["fields"],
             metadata_de["resources"][0]["schema"]["fields"],
         )
+        elements_length = len(metadata["resources"][0]["schema"]["fields"])
     else:
         elements = list()
         for elem in metadata["resources"][0]["schema"]["fields"]:
             elements.append((elem, ""))
+        elements_length = len(elements)
+    i = 1
     for elem, elem_de in elements:
+        print(str(i) + "/" + str(elements_length))
+        i = i + 1
         varname = elem["name"].lower()
         try:
             stat[varname] = stat_dict(
@@ -310,7 +326,7 @@ def generate_stat(
                     study
                 )
         except Exception as e:
-            print(e.message, e.args)
+            print(e)
     
     return stat
 
