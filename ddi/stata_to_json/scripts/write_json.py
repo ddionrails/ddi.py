@@ -118,10 +118,7 @@ def stats_cat(elem, file_csv):
     names = ["valid", "invalid"]
     values = []
 
-    total = int(file_csv[elem["name"]].size)
-    
-    # TODO: invalid values are also missings
-    
+    total = int(file_csv[elem["name"]].size)    
     invalid = int(file_csv[elem["name"]].isnull().sum()) + int(sum(n < 0 for n in file_csv[elem["name"]]))
     valid = total - invalid
 
