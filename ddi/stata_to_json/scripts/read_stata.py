@@ -98,7 +98,7 @@ def parse_dataset(data, stata_name):
 
 
 def read_stata(stata_name):
-    logger.info('read "' + stata_name + '"')
+    print('read "' + stata_name + '"')
     data = pd.read_stata(stata_name, iterator=True, convert_categoricals=False)
     d, m = parse_dataset(data, stata_name)
     return d, m
