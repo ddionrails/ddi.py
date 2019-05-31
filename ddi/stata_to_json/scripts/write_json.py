@@ -178,8 +178,8 @@ def stats_number(elem, file_csv):
         third_q = np.median(sorted(data_wm)[mid + 1 :])
 
     total = int(file_csv[elem["name"]].size)
-    valid = total - int(file_csv[elem["name"]].isnull().sum())
-    invalid = int(file_csv[elem["name"]].isnull().sum())
+    invalid = int(file_csv[elem["name"]].isnull().sum()) + int(sum(n < 0 for n in file_csv[elem["name"]]))
+    valid = total - invalid
 
     value_names = [min_val, first_q, median, mean, third_q, max_val, valid, invalid]
 
