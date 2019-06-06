@@ -205,6 +205,9 @@ def uni_statistics(elem, file_csv):
     elif elem["type"] == "number":
 
         statistics = stats_number(elem, file_csv)
+    
+    else:
+        statistics = dict()
 
     return statistics
 
@@ -230,6 +233,9 @@ def uni(elem, elem_de, file_csv):
         number_dict = uni_number(elem, file_csv)
 
         statistics.update(number_dict)
+        
+    else:
+        pass
 
     return statistics
     
