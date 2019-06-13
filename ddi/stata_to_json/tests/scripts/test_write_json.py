@@ -6,45 +6,6 @@ from scripts.write_json import *
 
 class TestWriteJson(unittest.TestCase):        
     
-    def get_testdata(self):
-        data = dict()
-        
-        # Testdata for categorical variables
-        data["testcat"] = dict()
-        data["testcat"]["name"] = "testcat"
-        data["testcat"]["label"] = "categorical test variable"
-        data["testcat"]["type"] = "cat"
-        data["testcat"]["values"] = [{"value": -1, "label": "missing"}, {"value": 1, "label": "a"}, {"value": 2, "label": "b"}]
-        data["testcat"]["element_de"] = ""
-        data["testcat"]["file_csv"] = pd.DataFrame([-1,-1,1,2,1,np.nan,1], columns=['testcat'])
-        
-        # Testdata for string variables
-        data["teststring"] = dict()
-        data["teststring"]["name"] = "teststring"
-        data["teststring"]["label"] = "string test variable"
-        data["teststring"]["type"] = "string"
-        data["teststring"]["element_de"] = ""
-        data["teststring"]["file_csv"] = pd.DataFrame(["", "a", "b", ".", np.nan, "c", np.nan], columns=['teststring'])
-        
-        # Testdata for numerical variables
-        data["testnumber"] = dict()
-        data["testnumber"]["name"] = "testnumber"
-        data["testnumber"]["label"] = "numerical test variable"
-        data["testnumber"]["type"] = "number"
-        data["testnumber"]["element_de"] = ""
-        data["testnumber"]["file_csv"] = pd.DataFrame([-1,-1,-2,5,10,10,15], columns=['testnumber'])
-        data["testnumber"]["names"] = ["Min.", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max.", "valid", "invalid"]
-        
-        # Testdata for variables without type
-        data["testother"] = dict()
-        data["testother"]["name"] = "testother"
-        data["testother"]["label"] = "other test variable"
-        data["testother"]["type"] = ""
-        data["testother"]["element_de"] = ""
-        data["testother"]["file_csv"] = pd.DataFrame([-1,"a",-2,5,"b",np.nan,15], columns=['testother'])
-        
-        return data
-    
     def get_testdatatable(self):
         data_table = pd.DataFrame()
         data_table["TESTCAT"] = [-1,-1,1,2,1,np.nan,1]
@@ -108,10 +69,10 @@ class TestWriteJson(unittest.TestCase):
         return study
         
     def test_uni_cat(self):
-        data = self.get_testdata()
-        element = data["testcat"]
-        element_de = data["testcat"]["element_de"]
-        file_csv = data["testcat"]["file_csv"]
+        metadata = self.get_testmetadata()
+        element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTCAT"), None)
+        element_de = ""
+        file_csv = self.get_testdatatable()
         
         cat_dict = uni_cat(element, element_de, file_csv)
         
@@ -125,9 +86,9 @@ class TestWriteJson(unittest.TestCase):
                     )
     
     def test_uni_string(self):
-        data = self.get_testdata()
-        element = data["teststring"]
-        file_csv = data["teststring"]["file_csv"]
+        metadata = self.get_testmetadata()
+        element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTSTRING"), None)
+        file_csv = self.get_testdatatable()
         
         string_dict = uni_string(element, file_csv)
         
@@ -142,9 +103,9 @@ class TestWriteJson(unittest.TestCase):
                     )
                     
     def test_uni_number(self):
-        data = self.get_testdata()
-        element = data["testnumber"]
-        file_csv = data["testnumber"]["file_csv"]
+        metadata = self.get_testmetadata()
+        element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTNUMBER"), None)
+        file_csv = self.get_testdatatable()
         
         number_dict = uni_number(element, file_csv)
         
@@ -159,9 +120,9 @@ class TestWriteJson(unittest.TestCase):
                     )
         
     def test_stats_cat(self):
-        data = self.get_testdata()
-        element = data["testcat"]        
-        file_csv = data["testcat"]["file_csv"]
+        metadata = self.get_testmetadata()
+        element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTCAT"), None)       
+        file_csv = self.get_testdatatable()
         
         statistics = stats_cat(element, file_csv)
         
@@ -173,9 +134,9 @@ class TestWriteJson(unittest.TestCase):
                     )
     
     def test_stats_string(self):
-        data = self.get_testdata()
-        element = data["teststring"]        
-        file_csv = data["teststring"]["file_csv"]
+        metadata = self.get_testmetadata()
+        element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTSTRING"), None)        
+        file_csv = self.get_testdatatable()
         
         statistics = stats_string(element, file_csv)
         
@@ -187,11 +148,11 @@ class TestWriteJson(unittest.TestCase):
                     )
     
     def test_stats_number(self):
-        data = self.get_testdata()
-        element = data["testnumber"]        
-        file_csv = data["testnumber"]["file_csv"]
+        metadata = self.get_testmetadata()
+        element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTNUMBER"), None)        
+        file_csv = self.get_testdatatable()
         
-        names = data["testnumber"]["names"]
+        names = ["Min.", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max.", "valid", "invalid"]
         
         statistics = stats_number(element, file_csv)
         
@@ -204,9 +165,9 @@ class TestWriteJson(unittest.TestCase):
         
     
     def test_uni_statistics_cat(self):
-        data = self.get_testdata()
-        element = data["testcat"]        
-        file_csv = data["testcat"]["file_csv"]
+        metadata = self.get_testmetadata()
+        element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTCAT"), None)       
+        file_csv = self.get_testdatatable()
         
         statistics = uni_statistics(element, file_csv)
         
@@ -219,9 +180,9 @@ class TestWriteJson(unittest.TestCase):
         
         
     def test_uni_statistics_string(self):
-        data = self.get_testdata()
-        element = data["teststring"]        
-        file_csv = data["teststring"]["file_csv"]
+        metadata = self.get_testmetadata()
+        element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTSTRING"), None)       
+        file_csv = self.get_testdatatable()
         
         statistics = uni_statistics(element, file_csv)
         
@@ -233,11 +194,11 @@ class TestWriteJson(unittest.TestCase):
                     )
         
     def test_uni_statistics_number(self):
-        data = self.get_testdata()
-        element = data["testnumber"]        
-        file_csv = data["testnumber"]["file_csv"]
+        metadata = self.get_testmetadata()
+        element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTNUMBER"), None)       
+        file_csv = self.get_testdatatable()
         
-        names = data["testnumber"]["names"]
+        names = ["Min.", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max.", "valid", "invalid"]
         
         statistics = uni_statistics(element, file_csv)
         
@@ -250,9 +211,9 @@ class TestWriteJson(unittest.TestCase):
         
         
     def test_uni_statistics_other(self):
-        data = self.get_testdata()
-        element = data["testother"]        
-        file_csv = data["testother"]["file_csv"]
+        metadata = self.get_testmetadata()
+        element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTOTHER"), None)        
+        file_csv = self.get_testdatatable()
         
         statistics = uni_statistics(element, file_csv)
         
@@ -260,10 +221,10 @@ class TestWriteJson(unittest.TestCase):
         
     
     def test_uni_cat(self):
-        data = self.get_testdata()
-        element = data["testcat"]
-        element_de = data["testcat"]["element_de"]
-        file_csv = data["testcat"]["file_csv"]
+        metadata = self.get_testmetadata()
+        element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTCAT"), None)
+        element_de = ""
+        file_csv = self.get_testdatatable()
         
         cat_dict = uni(element, element_de, file_csv)
         
@@ -277,10 +238,10 @@ class TestWriteJson(unittest.TestCase):
                     )
         
     def test_uni_string(self):
-        data = self.get_testdata()
-        element = data["teststring"]
-        element_de = data["teststring"]["element_de"]
-        file_csv = data["teststring"]["file_csv"]
+        metadata = self.get_testmetadata()
+        element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTSTRING"), None)
+        element_de = ""
+        file_csv = self.get_testdatatable()
         
         string_dict = uni(element, element_de, file_csv)
         
@@ -295,10 +256,10 @@ class TestWriteJson(unittest.TestCase):
                     )
         
     def test_uni_number(self):
-        data = self.get_testdata()
-        element = data["testnumber"]
-        element_de = data["testnumber"]["element_de"]
-        file_csv = data["testnumber"]["file_csv"]
+        metadata = self.get_testmetadata()
+        element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTNUMBER"), None)
+        element_de = ""
+        file_csv = self.get_testdatatable()
         
         number_dict = uni(element, element_de, file_csv)
         
@@ -313,20 +274,20 @@ class TestWriteJson(unittest.TestCase):
                     )
         
     def test_uni_other(self):
-        data = self.get_testdata()
-        element = data["testother"]
-        element_de = data["testother"]["element_de"]
-        file_csv = data["testother"]["file_csv"]
+        metadata = self.get_testmetadata()
+        element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTOTHER"), None)
+        element_de = ""
+        file_csv = self.get_testdatatable()
         
         other_dict = uni(element, element_de, file_csv)
         
         assert other_dict == dict()
     
     def test_stat_dict(self):
-        data = self.get_testdata()
-        element = data["testcat"] 
-        element_de = data["testcat"]["element_de"]
-        file_csv = data["testcat"]["file_csv"]
+        metadata = self.get_testmetadata()
+        element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTCAT"), None) 
+        element_de = ""
+        file_csv = self.get_testdatatable()
         
         study_information = self.get_teststudy()
         file_json = self.get_testmetadata()
@@ -350,8 +311,6 @@ class TestWriteJson(unittest.TestCase):
         boost,
         study)
         
-        print(x)
-        
         assert x == OrderedDict(
                                 [
                                     ('study', 'teststudy'), 
@@ -362,8 +321,8 @@ class TestWriteJson(unittest.TestCase):
                                     ('dataset', 'teststudy'), 
                                     ('variable', 'testcat'), 
                                     ('name', 'testcat'), 
-                                    ('name_cs', 'testcat'), 
-                                    ('label', 'categorical test variable'), 
+                                    ('name_cs', 'TESTCAT'), 
+                                    ('label', 'label for testcat'), 
                                     ('scale', 'cat'), 
                                     ('categories', OrderedDict(
                                                         [
