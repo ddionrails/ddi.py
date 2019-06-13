@@ -12,7 +12,16 @@ import pandas as pd
 from scipy.stats import gaussian_kde
 
 def uni_cat(elem, elem_de, file_csv):
-    """Generate dict with frequencies and labels for categorical variables"""
+    """Generate dict with frequencies and labels for categorical variables
+    
+    Input:
+    elem: dict
+    elem_de: dict or string if there is no second language ("")
+    file_csv: pandas DataFrame
+    
+    Output:
+    cat_dict: OrderedDict
+    """
 
     frequencies = []
     values = []
@@ -64,9 +73,6 @@ def uni_cat(elem, elem_de, file_csv):
                     values.append(stata_missings[var_value])
                 else:
                     values.append(var_value)
-    """
-    missing_count = sum(i<0 for i in file_csv[elem["name"]])
-    """
 
     cat_dict = OrderedDict(
         [
@@ -83,8 +89,16 @@ def uni_cat(elem, elem_de, file_csv):
 
 
 def uni_string(elem, file_csv):
-    """Generate dict with frequencies for nominal variables"""
-
+    """Generate dict with frequencies for nominal variables
+    
+    Input:
+    elem: dict
+    file_csv: pandas DataFrame
+    
+    Output:
+    stat_dict: OrderedDict
+    """
+    
     string_dict = OrderedDict()
     
     string_dict["frequencies"]= []
@@ -97,8 +111,16 @@ def uni_string(elem, file_csv):
 
 
 def uni_number(elem, file_csv, num_density_elements=20):
-    """Generate dict with frequencies for numerical variables"""
-
+    """Generate dict with frequencies for numerical variables
+    
+    Input:
+    elem: dict
+    file_csv: pandas DataFrame
+    num_density_elements: int (number of steps for density calculations; not now implemented)
+    
+    Output:
+    number_dict: OrderedDict
+    """
     number_dict = OrderedDict()
     
     number_dict["frequencies"]= []
@@ -111,7 +133,15 @@ def uni_number(elem, file_csv, num_density_elements=20):
 
 
 def stats_cat(elem, file_csv):
-    """Generate dict with statistics for categorical variables"""
+    """Generate dict with statistics for categorical variables
+    
+    Input:
+    elem: dict
+    file_csv: pandas DataFrame
+    
+    Output:
+    statistics: OrderedDict
+    """
 
     data_wm = file_csv[file_csv[elem["name"]] >= 0][elem["name"]]
 
@@ -133,8 +163,16 @@ def stats_cat(elem, file_csv):
     
 
 def stats_string(elem, file_csv):
-    """Generate dict with statistics for nominal variables"""
-
+    """Generate dict with statistics for nominal variables
+    
+    Input:
+    elem: dict
+    file_csv: pandas DataFrame
+    
+    Output:
+    statistics: OrderedDict
+    """
+    
     names = ["valid", "invalid"]
     values = []
 
@@ -157,7 +195,15 @@ def stats_string(elem, file_csv):
     
 
 def stats_number(elem, file_csv):
-    """Generate dict with statistics for numerical variables"""
+    """Generate dict with statistics for numerical variables
+    
+    Input:
+    elem: dict
+    file_csv: pandas DataFrame
+    
+    Output:
+    statistics: OrderedDict
+    """
 
     data_wm = file_csv[file_csv[elem["name"]] >= 0][elem["name"]]
 
@@ -192,8 +238,16 @@ def stats_number(elem, file_csv):
 
 
 def uni_statistics(elem, file_csv):
-    """Call function to generate statistics depending on the variable type"""
-
+    """Call function to generate statistics depending on the variable type
+    
+    Input:
+    elem: dict
+    file_csv: pandas DataFrame
+    
+    Output:
+    statistics: OrderedDict
+    """
+    
     if elem["type"] == "cat":
 
         statistics = stats_cat(elem, file_csv)
@@ -213,8 +267,17 @@ def uni_statistics(elem, file_csv):
 
 
 def uni(elem, elem_de, file_csv):
-    """Call function to generate frequencies depending on the variable type"""
-
+    """Call function to generate frequencies depending on the variable type
+    
+    Input:
+    elem: dict
+    elem_de: dict or string if there is no second language ("")
+    file_csv: pandas DataFrame
+    
+    Output:
+    statistics: OrderedDict
+    """
+    
     statistics = OrderedDict()
 
     if elem["type"] == "cat":
@@ -252,7 +315,23 @@ def stat_dict(
     boost,
     study
 ):
-    """Fill variables with metadata of the dataset."""
+    """Fill variables with metadata of the dataset.
+    
+    Input:
+    elem: dict
+    elem_de: dict or string if there is no second language ("")
+    file_csv: pandas DataFrame
+    file_json: dict
+    file_de_json: dict or string if there is no second language ("")
+    analysis_unit: string
+    period: string
+    sub_type: string
+    boost: int
+    study: string
+    
+    Output:
+    stat_dict: OrderedDict
+    """
     
     scale = elem["type"][0:3]
 
@@ -299,7 +378,21 @@ def generate_stat(
     boost,
     study
 ):
-    """Prepare statistics for every variable"""
+    """Prepare statistics for every variable
+    
+    Input:
+    data: pandas DataFrame (later called file_csv)
+    metadata: dict (later called file_json)
+    metadata_de: dict or string ("") (later called file_de_json)
+    analysis_unit: string
+    period: string
+    sub_type: string
+    boost: int
+    study: string
+    
+    Output:
+    stat: OrderedDict
+    """
 
     stat = OrderedDict()
     if metadata_de != "":
@@ -350,6 +443,20 @@ def write_json(
     study="",
     metadata_de=""
 ):
+    """Main function to write json.
+    
+    Input:
+    data: pandas DataFrame (later called file_csv)
+    metadata: dict (later called file_json)
+    filename: string
+    analysis_unit: string
+    period: string
+    sub_type: string
+    boost: int or string if empty ("")
+    study: string
+    metadata_de: dict or string ("") (later called file_de_json)
+    """
+    
     stat = generate_stat(
         data,
         metadata,
