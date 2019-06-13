@@ -78,7 +78,7 @@ class TestWriteJson(unittest.TestCase):
         
         assert cat_dict == OrderedDict(
                         [
-                            ('frequencies', [2, 4, 2]),
+                            ('frequencies', [2, 3, 1]),
                             ('values', ['-1', '1', '2']),
                             ('missings', ['true', 'false', 'false']), 
                             ('labels', ['missing', 'a', 'b'])
@@ -220,7 +220,7 @@ class TestWriteJson(unittest.TestCase):
         assert statistics == dict()
         
     
-    def test_uni_cat(self):
+    def test_uni_testcat(self):
         metadata = self.get_testmetadata()
         element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTCAT"), None)
         element_de = ""
@@ -237,7 +237,7 @@ class TestWriteJson(unittest.TestCase):
                         ]
                     )
         
-    def test_uni_string(self):
+    def test_uni_teststring(self):
         metadata = self.get_testmetadata()
         element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTSTRING"), None)
         element_de = ""
@@ -255,7 +255,7 @@ class TestWriteJson(unittest.TestCase):
                         ]
                     )
         
-    def test_uni_number(self):
+    def test_uni_testnumber(self):
         metadata = self.get_testmetadata()
         element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTNUMBER"), None)
         element_de = ""
@@ -273,7 +273,7 @@ class TestWriteJson(unittest.TestCase):
                         ]
                     )
         
-    def test_uni_other(self):
+    def test_uni_testother(self):
         metadata = self.get_testmetadata()
         element = next((var for var in metadata["resources"][0]["schema"]["fields"] if var["name"] == "TESTOTHER"), None)
         element_de = ""
