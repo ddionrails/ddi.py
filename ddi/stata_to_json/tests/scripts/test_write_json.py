@@ -465,8 +465,136 @@ class TestWriteJson(unittest.TestCase):
             )
     
     def test_write_json(self):
-        pass
-    
+        data = self.get_testdatatable()
+        study_information = self.get_teststudy()
+        metadata = self.get_testmetadata()
+        
+        metadata_de = study_information["file_de_json"]
+        
+        analysis_unit = study_information["analysis_unit"]
+        period = study_information["period"]
+        sub_type = study_information["sub_type"]
+        boost = study_information["boost"]
+        study = study_information["study"]
+        
+        filename = "output/test.json"
+        
+        stat = write_json(
+        data,
+        metadata,
+        filename,
+        analysis_unit,
+        period,
+        sub_type,
+        boost,
+        study,
+        metadata_de)
+        
+        with open(filename) as json_file:
+            output = json.load(json_file)
+            
+        assert output ==    {
+                              "testcat": {
+                                "study": "teststudy",
+                                "analysis_unit": "testunit",
+                                "period": "2019",
+                                "sub_type": "testtype",
+                                "boost": 1,
+                                "dataset": "teststudy",
+                                "variable": "testcat",
+                                "name": "testcat",
+                                "name_cs": "TESTCAT",
+                                "label": "label for testcat",
+                                "scale": "cat",
+                                "categories": {
+                                  "frequencies": [
+                                    2,
+                                    3,
+                                    1
+                                  ],
+                                  "values": [
+                                    "-1",
+                                    "1",
+                                    "2"
+                                  ],
+                                  "missings": [
+                                    "true",
+                                    "false",
+                                    "false"
+                                  ],
+                                  "labels": [
+                                    "missing",
+                                    "a",
+                                    "b"
+                                  ]
+                                }
+                              },
+                              "teststring": {
+                                "study": "teststudy",
+                                "analysis_unit": "testunit",
+                                "period": "2019",
+                                "sub_type": "testtype",
+                                "boost": 1,
+                                "dataset": "teststudy",
+                                "variable": "teststring",
+                                "name": "teststring",
+                                "name_cs": "TESTSTRING",
+                                "label": "label for teststring",
+                                "scale": "str",
+                                "categories": {
+                                  "frequencies": [],
+                                  "labels": [],
+                                  "missings": [],
+                                  "values": [],
+                                  "labels_de": []
+                                },
+                                "statistics": {
+                                  "names": [
+                                    "valid",
+                                    "invalid"
+                                  ],
+                                  "values": [
+                                    "3",
+                                    "4"
+                                  ]
+                                }
+                              },
+                              "testnumber": {
+                                "study": "teststudy",
+                                "analysis_unit": "testunit",
+                                "period": "2019",
+                                "sub_type": "testtype",
+                                "boost": 1,
+                                "dataset": "teststudy",
+                                "variable": "testnumber",
+                                "name": "testnumber",
+                                "name_cs": "TESTNUMBER",
+                                "label": "label for testnumber",
+                                "scale": "num",
+                                "categories": {
+                                  "frequencies": [],
+                                  "labels": [],
+                                  "missings": [],
+                                  "values": [],
+                                  "labels_de": []
+                                }
+                              },
+                              "testother": {
+                                "study": "teststudy",
+                                "analysis_unit": "testunit",
+                                "period": "2019",
+                                "sub_type": "testtype",
+                                "boost": 1,
+                                "dataset": "teststudy",
+                                "variable": "testother",
+                                "name": "testother",
+                                "name_cs": "TESTOTHER",
+                                "label": "label for other test type",
+                                "scale": "",
+                                "categories": {},
+                                "statistics": {}
+                              }
+                            }
 
 if __name__ == '__main__':
     unittest.main()
