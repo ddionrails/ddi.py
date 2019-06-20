@@ -1,13 +1,8 @@
-import logging
-import os
-import sys
-
 import pandas as pd
 from .dataset import Dataset
 
-def stata_to_json(
-    study_name, input_csv, input_path, output_path, input_path_de=""
-):
+
+def stata_to_json(study_name, input_csv, input_path, output_path, input_path_de=""):
     filereader = pd.read_csv(input_csv, delimiter=",", header=0)
 
     for data, analysis_unit, period, sub_type, boost in zip(
@@ -31,9 +26,8 @@ def stata_to_json(
                 d2.read_stata(input_path_de + data + ".dta")
                 metadata_de = d2.metadata
             except:
-                print(
-                    "Unable to find " + data + ".dta in " + input_path_de + "."
-                )
+                print("Unable to find " + data +
+                      ".dta in " + input_path_de + ".")
                 continue
 
         d1.write_json(

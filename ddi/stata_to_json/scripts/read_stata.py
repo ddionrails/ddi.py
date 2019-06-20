@@ -27,7 +27,6 @@ def cat_values(var, varscale, df_data, data):
 
     for sn, label in enumerate(data.lbllist):
         if label == varscale["name"]:
-            value_list = label
             value_labels = label_dict[label]
 
     for v, l in value_labels.items():
@@ -88,7 +87,8 @@ def parse_dataset(data, stata_name):
     # varlabels = [dict(name=data.variable_labels()[varlabel], sn=sn) for sn, varlabel in enumerate(data.variable_labels()) ]
     varlabels = data.variable_labels()
 
-    varscale = [dict(name=varscale, sn=sn) for sn, varscale in enumerate(data.lbllist)]
+    varscale = [dict(name=varscale, sn=sn)
+                for sn, varscale in enumerate(data.lbllist)]
     # varvalues = data.value_labels()
 
     dta_file = re.search("^.*\/(.*)", stata_name).group(1)

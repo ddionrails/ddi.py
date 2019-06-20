@@ -1,0 +1,28 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pytest = "*"
+ipython = "*"
+pylint = "*"
+autoflake = "*"
+black = "==19.3b0"
+autopep8 = "*"
+
+[packages]
+pandas = "*"
+jinja2 = "*"
+pipreqs = "*"
+numpy="*"
+setuptools="*"
+docutils="*"
+lxml="*"
+Paver="*"
+scipy="*"
+Sphinx="*"
+PyYAML="*"
+
+[requires]
+python_version = "3.6"

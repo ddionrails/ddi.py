@@ -35,7 +35,6 @@ Released under the WTFPL (http://sam.zoy.org/wtfpl/).
 from docutils import nodes
 from docutils.parsers.rst import directives
 from sphinx.directives.code import CodeBlock
-from docutils.parsers.rst.directives.admonitions import BaseAdmonition as make_admonition
 
 HCB_COUNTER = 0
 

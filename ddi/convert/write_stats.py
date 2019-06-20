@@ -299,7 +299,7 @@ def stats_string(elem, file_csv):
             data_wm.iloc[[index]] = ""
     """
 
-    total = int(file_csv[elem["name"]].size)
+    int(file_csv[elem["name"]].size)
     valid = int(file_csv[elem["name"]].value_counts().sum())
     invalid = int(file_csv[elem["name"]].isnull().sum())
     for i in file_csv[elem["name"]]:

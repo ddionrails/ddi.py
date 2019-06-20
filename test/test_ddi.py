@@ -1,6 +1,4 @@
-import os
 import unittest
-import pandas
 from ddi import statareader
 
 class TestStataReader(unittest.TestCase):

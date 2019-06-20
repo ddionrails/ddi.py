@@ -27,7 +27,6 @@ def cat_values(var, varscale, df_data, data):
 
     for sn, label in enumerate(data.lbllist):
         if label == varscale["name"]:
-            value_list = label
             value_labels = label_dict[label]
 
     for v, l in value_labels.items():

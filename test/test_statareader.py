@@ -1,4 +1,3 @@
-import os
 import unittest
 import pandas
 from ddi import statareader
