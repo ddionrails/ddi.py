@@ -1,3 +1,6 @@
+"""test_write_json.py"""
+__author__ = "Marius Pahl"
+
 import unittest
 import tempfile
 import pandas as pd
@@ -7,12 +10,21 @@ from scripts.write_json import *
 
 
 class TestWriteJson(unittest.TestCase):
+    '''
+    Tests for all methods from write_json.py
+    '''
 
     def setUp(self):
+        '''
+        Set a TemporaryDirectory for the json testfile
+        '''
         self.sandbox = tempfile.TemporaryDirectory()
         return super().setUp()
 
     def get_testdatatable(self):
+        '''
+        Create a test dataframe
+        '''
         data_table = pd.DataFrame()
         data_table["TESTCAT"] = [-1, -1, 1, 2, 1, np.nan, 1]
         data_table["TESTSTRING"] = ["", "a", "b", ".", np.nan, "c", np.nan]
@@ -22,11 +34,14 @@ class TestWriteJson(unittest.TestCase):
         return data_table
 
     def get_testmetadata(self):
-        m = dict()
-        m["name"] = "teststudy"
-        m["resources"] = list()
-        m["resources"].append(dict(path="testpath", schema=dict()))
-        m["resources"][0]["schema"]["fields"] = list()
+        '''
+        Create test metadata
+        '''
+        metadata = dict()
+        metadata["name"] = "teststudy"
+        metadata["resources"] = list()
+        metadata["resources"].append(dict(path="testpath", schema=dict()))
+        metadata["resources"][0]["schema"]["fields"] = list()
 
         catvar = dict()
         catvar["label"] = "label for testcat"
@@ -37,32 +52,35 @@ class TestWriteJson(unittest.TestCase):
         catvar["values"].append(dict(label="a", value=1))
         catvar["values"].append(dict(label="b", value=2))
 
-        m["resources"][0]["schema"]["fields"].append(catvar)
+        metadata["resources"][0]["schema"]["fields"].append(catvar)
 
         stringvar = dict()
         stringvar["label"] = "label for teststring"
         stringvar["type"] = "string"
         stringvar["name"] = "TESTSTRING"
 
-        m["resources"][0]["schema"]["fields"].append(stringvar)
+        metadata["resources"][0]["schema"]["fields"].append(stringvar)
 
         numvar = dict()
         numvar["label"] = "label for testnumber"
         numvar["type"] = "number"
         numvar["name"] = "TESTNUMBER"
 
-        m["resources"][0]["schema"]["fields"].append(numvar)
+        metadata["resources"][0]["schema"]["fields"].append(numvar)
 
         othervar = dict()
         othervar["label"] = "label for other test type"
         othervar["type"] = ""
         othervar["name"] = "TESTOTHER"
 
-        m["resources"][0]["schema"]["fields"].append(othervar)
+        metadata["resources"][0]["schema"]["fields"].append(othervar)
 
-        return m
+        return metadata
 
     def get_teststudy(self):
+        '''
+        Create a test study
+        '''
         study = dict()
 
         study["file_de_json"] = ""
@@ -75,6 +93,9 @@ class TestWriteJson(unittest.TestCase):
         return study
 
     def test_uni_cat(self):
+        '''
+        Test for uni_cat
+        '''
         metadata = self.get_testmetadata()
         element = next(
             (
@@ -99,18 +120,11 @@ class TestWriteJson(unittest.TestCase):
         )
 
     def test_uni_string(self):
-        metadata = self.get_testmetadata()
-        element = next(
-            (
-                var
-                for var in metadata["resources"][0]["schema"]["fields"]
-                if var["name"] == "TESTSTRING"
-            ),
-            None,
-        )
-        file_csv = self.get_testdatatable()
+        '''
+        Test for uni_string
+        '''
 
-        string_dict = uni_string(element, file_csv)
+        string_dict = uni_string()
 
         assert string_dict == OrderedDict(
             [
@@ -123,18 +137,11 @@ class TestWriteJson(unittest.TestCase):
         )
 
     def test_uni_number(self):
-        metadata = self.get_testmetadata()
-        element = next(
-            (
-                var
-                for var in metadata["resources"][0]["schema"]["fields"]
-                if var["name"] == "TESTNUMBER"
-            ),
-            None,
-        )
-        file_csv = self.get_testdatatable()
+        '''
+        Test for uni_number
+        '''
 
-        number_dict = uni_number(element, file_csv)
+        number_dict = uni_number()
 
         assert number_dict == OrderedDict(
             [
@@ -147,6 +154,9 @@ class TestWriteJson(unittest.TestCase):
         )
 
     def test_stats_cat(self):
+        '''
+        Test for stats_cat
+        '''
         metadata = self.get_testmetadata()
         element = next(
             (
@@ -165,6 +175,9 @@ class TestWriteJson(unittest.TestCase):
         )
 
     def test_stats_string(self):
+        '''
+        Test for stats_string
+        '''
         metadata = self.get_testmetadata()
         element = next(
             (
@@ -183,6 +196,9 @@ class TestWriteJson(unittest.TestCase):
         )
 
     def test_stats_number(self):
+        '''
+        Test for stats_number
+        '''
         metadata = self.get_testmetadata()
         element = next(
             (
@@ -217,6 +233,9 @@ class TestWriteJson(unittest.TestCase):
         )
 
     def test_uni_statistics_cat(self):
+        '''
+        Test for categorical variables in uni_statistics
+        '''
         metadata = self.get_testmetadata()
         element = next(
             (
@@ -235,6 +254,9 @@ class TestWriteJson(unittest.TestCase):
         )
 
     def test_uni_statistics_string(self):
+        '''
+        Test for nominal variables in uni_statistics
+        '''
         metadata = self.get_testmetadata()
         element = next(
             (
@@ -253,6 +275,9 @@ class TestWriteJson(unittest.TestCase):
         )
 
     def test_uni_statistics_number(self):
+        '''
+        Test for numerical variables in uni_statistics
+        '''
         metadata = self.get_testmetadata()
         element = next(
             (
@@ -263,17 +288,6 @@ class TestWriteJson(unittest.TestCase):
             None,
         )
         file_csv = self.get_testdatatable()
-
-        names = [
-            "Min.",
-            "1st Qu.",
-            "Median",
-            "Mean",
-            "3rd Qu.",
-            "Max.",
-            "valid",
-            "invalid",
-        ]
 
         statistics = uni_statistics(element, file_csv)
 
@@ -298,6 +312,9 @@ class TestWriteJson(unittest.TestCase):
         )
 
     def test_uni_statistics_other(self):
+        '''
+        Test for other variables in uni_statistics
+        '''
         metadata = self.get_testmetadata()
         element = next(
             (
@@ -314,6 +331,9 @@ class TestWriteJson(unittest.TestCase):
         assert statistics == dict()
 
     def test_uni_testcat(self):
+        '''
+        Test for categorical variables in uni
+        '''
         metadata = self.get_testmetadata()
         element = next(
             (
@@ -338,6 +358,9 @@ class TestWriteJson(unittest.TestCase):
         )
 
     def test_uni_teststring(self):
+        '''
+        Test for nominal variables in uni
+        '''
         metadata = self.get_testmetadata()
         element = next(
             (
@@ -363,6 +386,9 @@ class TestWriteJson(unittest.TestCase):
         )
 
     def test_uni_testnumber(self):
+        '''
+        Test for numerical variables in uni
+        '''
         metadata = self.get_testmetadata()
         element = next(
             (
@@ -388,6 +414,9 @@ class TestWriteJson(unittest.TestCase):
         )
 
     def test_uni_testother(self):
+        '''
+        Test for other variables in uni
+        '''
         metadata = self.get_testmetadata()
         element = next(
             (
@@ -405,6 +434,9 @@ class TestWriteJson(unittest.TestCase):
         assert other_dict == dict()
 
     def test_stat_dict(self):
+        '''
+        Test for stat_dict
+        '''
         metadata = self.get_testmetadata()
         element = next(
             (
@@ -420,19 +452,17 @@ class TestWriteJson(unittest.TestCase):
         study_information = self.get_teststudy()
         file_json = self.get_testmetadata()
 
-        file_de_json = study_information["file_de_json"]
         study = study_information["study"]
         analysis_unit = study_information["analysis_unit"]
         period = study_information["period"]
         sub_type = study_information["sub_type"]
         boost = study_information["boost"]
 
-        x = stat_dict(
+        generated_data = stat_dict(
             element,
             element_de,
             file_csv,
             file_json,
-            file_de_json,
             analysis_unit,
             period,
             sub_type,
@@ -440,7 +470,7 @@ class TestWriteJson(unittest.TestCase):
             study,
         )
 
-        assert x == OrderedDict(
+        assert generated_data == OrderedDict(
             [
                 ("study", "teststudy"),
                 ("analysis_unit", "testunit"),
@@ -468,6 +498,9 @@ class TestWriteJson(unittest.TestCase):
         )
 
     def test_generate_stat(self):
+        '''
+        Test for generate_stat
+        '''
         data = self.get_testdatatable()
         study_information = self.get_teststudy()
         file_json = self.get_testmetadata()
@@ -479,11 +512,11 @@ class TestWriteJson(unittest.TestCase):
         sub_type = study_information["sub_type"]
         boost = study_information["boost"]
 
-        x = generate_stat(
+        generated_data = generate_stat(
             data, file_json, file_de_json, analysis_unit, period, sub_type, boost, study
         )
 
-        assert x == OrderedDict(
+        assert generated_data == OrderedDict(
             [
                 (
                     "testcat",
@@ -608,6 +641,9 @@ class TestWriteJson(unittest.TestCase):
         )
 
     def test_write_json(self):
+        '''
+        Test for write_json
+        '''
         data = self.get_testdatatable()
         study_information = self.get_teststudy()
         metadata = self.get_testmetadata()
@@ -622,7 +658,7 @@ class TestWriteJson(unittest.TestCase):
 
         filename = self.sandbox.name +"/test.json"
 
-        stat = write_json(
+        write_json(
             data,
             metadata,
             filename,
@@ -716,6 +752,9 @@ class TestWriteJson(unittest.TestCase):
         }
 
     def tearDown(self):
+        '''
+        Clean TemporaryDirectory
+        '''
         self.sandbox.cleanup()
         return super().tearDown()
 

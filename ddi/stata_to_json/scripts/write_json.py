@@ -1,7 +1,9 @@
+"""write_json.py"""
+__author__ = "Marius Pahl"
+
 import json
 import math
 from collections import Counter, OrderedDict
-
 
 import numpy as np
 
@@ -39,7 +41,7 @@ def uni_cat(elem, elem_de, file_csv):
         labels_de = []
 
         value_count = file_csv[elem["name"]].value_counts()
-        for i, (value, value_de) in enumerate(zip(elem["values"], elem_de["values"])):
+        for (value, value_de) in zip(elem["values"], elem_de["values"]):
             try:
                 frequencies.append(int(value_count[value["value"]]))
             except:
@@ -60,7 +62,7 @@ def uni_cat(elem, elem_de, file_csv):
                     values.append(var_value)
     else:
         value_count = file_csv[elem["name"]].value_counts()
-        for i, value in enumerate(elem["values"]):
+        for value in elem["values"]:
             try:
                 frequencies.append(int(value_count[value["value"]]))
             except:
@@ -93,15 +95,11 @@ def uni_cat(elem, elem_de, file_csv):
     return cat_dict
 
 
-def uni_string(elem, file_csv):
+def uni_string():
     """Generate dict with frequencies for nominal variables
 
-    Input:
-    elem: dict
-    file_csv: pandas DataFrame
-
     Output:
-    stat_dict: OrderedDict
+    string_dict: OrderedDict
     """
 
     string_dict = OrderedDict()
@@ -115,7 +113,7 @@ def uni_string(elem, file_csv):
     return string_dict
 
 
-def uni_number(elem, file_csv, num_density_elements=20):
+def uni_number():
     """Generate dict with frequencies for numerical variables
 
     Input:
@@ -148,8 +146,6 @@ def stats_cat(elem, file_csv):
     statistics: OrderedDict
     """
 
-    data_wm = file_csv[file_csv[elem["name"]] >= 0][elem["name"]]
-
     names = ["valid", "invalid"]
     values = []
 
@@ -161,8 +157,8 @@ def stats_cat(elem, file_csv):
 
     value_names = [valid, invalid]
 
-    for v in value_names:
-        values.append(str(v))
+    for value_name in value_names:
+        values.append(str(value_name))
 
     statistics = OrderedDict([("names", names), ("values", values)])
 
@@ -187,14 +183,14 @@ def stats_string(elem, file_csv):
     valid = int(file_csv[elem["name"]].value_counts().sum())
     invalid = int(file_csv[elem["name"]].isnull().sum())
     for i in file_csv[elem["name"]]:
-        if i == "" or i == ".":
+        if i in ("", "."):
             valid = valid - 1
             invalid = invalid + 1
 
     value_names = [valid, invalid]
 
-    for v in value_names:
-        values.append(str(v))
+    for value_name in value_names:
+        values.append(str(value_name))
 
     statistics = OrderedDict([("names", names), ("values", values)])
 
@@ -240,8 +236,8 @@ def stats_number(elem, file_csv):
     value_names = [min_val, first_q, median,
                    mean, third_q, max_val, valid, invalid]
 
-    for v in value_names:
-        values.append(str(v))
+    for value_name in value_names:
+        values.append(str(value_name))
 
     statistics = OrderedDict([("names", names), ("values", values)])
 
@@ -298,13 +294,13 @@ def uni(elem, elem_de, file_csv):
 
     elif elem["type"] == "string":
 
-        string_dict = uni_string(elem, file_csv)
+        string_dict = uni_string()
 
         statistics.update(string_dict)
 
     elif elem["type"] == "number":
 
-        number_dict = uni_number(elem, file_csv)
+        number_dict = uni_number()
 
         statistics.update(number_dict)
 
@@ -319,7 +315,6 @@ def stat_dict(
     elem_de,
     file_csv,
     file_json,
-    file_de_json,
     analysis_unit,
     period,
     sub_type,
@@ -333,7 +328,6 @@ def stat_dict(
     elem_de: dict or string if there is no second language ("")
     file_csv: pandas DataFrame
     file_json: dict
-    file_de_json: dict or string if there is no second language ("")
     analysis_unit: string
     period: string
     sub_type: string
@@ -341,42 +335,42 @@ def stat_dict(
     study: string
 
     Output:
-    stat_dict: OrderedDict
+    meta_dict: OrderedDict
     """
 
     scale = elem["type"][0:3]
 
-    if type(sub_type) == np.float64 and math.isnan(sub_type) == True:
+    if isinstance(sub_type, np.float64) and math.isnan(sub_type) == True:
         sub_type = ""
 
-    stat_dict = OrderedDict()
+    meta_dict = OrderedDict()
 
-    stat_dict["study"] = study
-    stat_dict["analysis_unit"] = analysis_unit
-    stat_dict["period"] = str(period)
-    stat_dict["sub_type"] = sub_type
-    stat_dict["boost"] = boost
-    stat_dict["dataset"] = file_json["name"].lower()
-    stat_dict["variable"] = elem["name"].lower()
-    stat_dict["name"] = elem["name"].lower()
-    stat_dict["name_cs"] = elem["name"]
-    stat_dict["label"] = elem["label"]
-    stat_dict["scale"] = scale
-    stat_dict["categories"] = uni(elem, elem_de, file_csv)
+    meta_dict["study"] = study
+    meta_dict["analysis_unit"] = analysis_unit
+    meta_dict["period"] = str(period)
+    meta_dict["sub_type"] = sub_type
+    meta_dict["boost"] = boost
+    meta_dict["dataset"] = file_json["name"].lower()
+    meta_dict["variable"] = elem["name"].lower()
+    meta_dict["name"] = elem["name"].lower()
+    meta_dict["name_cs"] = elem["name"]
+    meta_dict["label"] = elem["label"]
+    meta_dict["scale"] = scale
+    meta_dict["categories"] = uni(elem, elem_de, file_csv)
 
     # For 10 or less values the statistics aren't shown.
 
     if elem["type"] == "number" or elem["type"] == "cat":
         data_wm = file_csv[file_csv[elem["name"]] >= 0][elem["name"]]
         if sum(Counter(data_wm.values).values()) > 10:
-            stat_dict["statistics"] = uni_statistics(elem, file_csv)
+            meta_dict["statistics"] = uni_statistics(elem, file_csv)
     else:
-        stat_dict["statistics"] = uni_statistics(elem, file_csv)
+        meta_dict["statistics"] = uni_statistics(elem, file_csv)
 
     if elem_de != "":
-        stat_dict["label_de"] = elem_de["label"]
+        meta_dict["label_de"] = elem_de["label"]
 
-    return stat_dict
+    return meta_dict
 
 
 def generate_stat(
@@ -421,15 +415,14 @@ def generate_stat(
                 elem_de,
                 data,
                 metadata,
-                metadata_de,
                 analysis_unit,
                 period,
                 sub_type,
                 boost,
                 study,
             )
-        except Exception as e:
-            print(e)
+        except Exception as exception:
+            print(exception)
 
     return stat
 

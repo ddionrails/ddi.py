@@ -1,8 +1,11 @@
-from scripts import stata_to_json
+"""main.py"""
+__author__ = "Marius Pahl"
+
 import os
+from scripts.stata_to_json import stata_to_json
 
-os.system("setup.sh")
-
+# Execute setup.py
+os.system("./setup.sh")
 
 stata_to_json(
     study_name="soep-core",

@@ -1,3 +1,6 @@
+"""dataset.py"""
+__author__ = "Marius Pahl"
+
 from .read_stata import read_stata
 from .write_json import write_json
 
@@ -27,7 +30,7 @@ class Dataset:
 
         Example:
 
-        dataset.read_stata("../input/dataset.dta")        
+        dataset.read_stata("../input/dataset.dta")
         """
         self.dataset, self.metadata = read_stata(dta_name)
 
@@ -53,7 +56,10 @@ class Dataset:
 
         Example:
 
-        dataset.write_json("../output/dataset.html", file_type="html", split="split", weight="weight") 
+        dataset.write_json("../output/dataset.html",
+                            file_type="html",
+                            split="split",
+                            weight="weight")
         """
         write_json(
             self.dataset,
