@@ -21,7 +21,8 @@ class TestWriteJson(unittest.TestCase):
         self.sandbox = tempfile.TemporaryDirectory()
         return super().setUp()
 
-    def get_testdatatable(self):
+    @ staticmethod
+    def get_testdatatable():
         '''
         Create a test dataframe
         '''
@@ -33,7 +34,8 @@ class TestWriteJson(unittest.TestCase):
 
         return data_table
 
-    def get_testmetadata(self):
+    @ staticmethod
+    def get_testmetadata():
         '''
         Create test metadata
         '''
@@ -77,7 +79,8 @@ class TestWriteJson(unittest.TestCase):
 
         return metadata
 
-    def get_teststudy(self):
+    @ staticmethod
+    def get_teststudy():
         '''
         Create a test study
         '''
@@ -119,7 +122,8 @@ class TestWriteJson(unittest.TestCase):
             ]
         )
 
-    def test_uni_string(self):
+    @ staticmethod
+    def test_uni_string():
         '''
         Test for uni_string
         '''
@@ -136,7 +140,8 @@ class TestWriteJson(unittest.TestCase):
             ]
         )
 
-    def test_uni_number(self):
+    @ staticmethod
+    def test_uni_number():
         '''
         Test for uni_number
         '''

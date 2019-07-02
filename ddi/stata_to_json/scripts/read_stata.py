@@ -69,12 +69,12 @@ def scale_var(var, varscale, df_data):
     return var_type
 
 
-def generate_tdp(vars, varlabels, varscales, dta_file, df_data, data):
+def generate_tdp(variables, varlabels, varscales, dta_file, df_data, data):
     '''
     Generate tabular data package file
 
     Input:
-    vars: list
+    variables: list
     varlabels: dict
     varscale: list
     dta_file: string
@@ -90,7 +90,7 @@ def generate_tdp(vars, varlabels, varscales, dta_file, df_data, data):
     tdp = {}
     fields = []
 
-    for var, varscale in zip(vars, varscales):
+    for var, varscale in zip(variables, varscales):
         scale = scale_var(var, varscale, df_data)
         meta = dict(name=var, label=varlabels[var], type=scale)
         if scale == "cat":
@@ -126,7 +126,7 @@ def parse_dataset(data, stata_name):
 
     datatable = data.read()
 
-    vars = data.varlist
+    variables = data.varlist
 
     varlabels = data.variable_labels()
 
@@ -134,7 +134,7 @@ def parse_dataset(data, stata_name):
                 for number, varscale in enumerate(data.lbllist)]
 
     dta_file = re.search(r"^.*\/(.*)", stata_name).group(1)
-    metadata = generate_tdp(vars, varlabels, varscales, dta_file, datatable, data)
+    metadata = generate_tdp(variables, varlabels, varscales, dta_file, datatable, data)
 
     return datatable, metadata
 

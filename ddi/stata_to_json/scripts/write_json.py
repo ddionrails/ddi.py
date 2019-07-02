@@ -44,7 +44,7 @@ def uni_cat(elem, elem_de, file_csv):
         for (value, value_de) in zip(elem["values"], elem_de["values"]):
             try:
                 frequencies.append(int(value_count[value["value"]]))
-            except:
+            except KeyError:
                 frequencies.append(0)
             labels.append(value["label"])
             labels_de.append(value_de["label"])
@@ -65,7 +65,7 @@ def uni_cat(elem, elem_de, file_csv):
         for value in elem["values"]:
             try:
                 frequencies.append(int(value_count[value["value"]]))
-            except:
+            except KeyError:
                 frequencies.append(0)
             labels.append(value["label"])
 
@@ -421,7 +421,7 @@ def generate_stat(
                 boost,
                 study,
             )
-        except Exception as exception:
+        except KeyError as exception:
             print(exception)
 
     return stat

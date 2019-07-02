@@ -28,7 +28,7 @@ def stata_to_json(study_name, input_csv, input_path, output_path, input_path_de=
         dataset_1 = Dataset()
         try:
             dataset_1.read_stata(input_path + data + ".dta")
-        except:
+        except IOError:
             print("Unable to find " + data + ".dta in " + input_path + ".")
             continue
 
@@ -38,7 +38,7 @@ def stata_to_json(study_name, input_csv, input_path, output_path, input_path_de=
             try:
                 dataset_2.read_stata(input_path_de + data + ".dta")
                 metadata_de = dataset_2.metadata
-            except:
+            except IOError:
                 print("Unable to find " + data +
                       ".dta in " + input_path_de + ".")
                 continue
