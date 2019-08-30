@@ -3,11 +3,10 @@ import json
 import os
 import re
 from collections import OrderedDict
-
-import yaml
-from lxml import etree
+from typing import Dict
 
 import pandas as pd
+from lxml import etree
 
 LANG_RE = re.compile(r"(\w{2})/[\w\d\-_]+.xml$", flags=re.IGNORECASE)
 
@@ -17,34 +16,19 @@ class Parser:
         self,
         study_name,
         r2ddi_path="r2ddi",
-        version=None,
         primary_language="en",
-        versions=["v1"],
+        versions=("v1",),
         latest_version="v1",
-        datasets_csv="ddionrails/datasets.csv",
-    ):
-        """
-        The ``version`` option is now DEPRECATED, pleas use the combination of
-        ``versions`` (list) and ``latest_version`` from now on.
-        """
+    ) -> None:
         self.study_name = study_name
         self.path = r2ddi_path
         self.versions = versions
         self.latest_version = latest_version
-        self.datasets_csv = None
-        if datasets_csv:
-            self._read_datasets_csv(datasets_csv)
-
-        # Temporary fix for the deprecated version option:
-        if version:
-            self.versions = [version]
-            self.latest_version = version
-
         self.primary_language = primary_language
         self.datasets = OrderedDict()
         self.run()
 
-    def run(self):
+    def run(self) -> None:
         primary_names = set(
             glob.glob(
                 os.path.join(
@@ -52,7 +36,6 @@ class Parser:
                 )
             )
         )
-        print(primary_names)
         secondary_names = set(
             glob.glob(os.path.join(self.path, self.latest_version, "*", "*.xml"))
         ).difference(primary_names)
@@ -65,7 +48,7 @@ class Parser:
             print("Translate:", file_name)
             self._parse_xml_file(file_name, translate=True)
 
-    def _parse_xml_file(self, path, translate=False):
+    def _parse_xml_file(self, path: str, translate: bool = False) -> None:
         xml_content = etree.parse(path)
         for xml_var in xml_content.findall("//var"):
             if translate:
@@ -77,15 +60,13 @@ class Parser:
             else:
                 self._parse_xml_var(xml_var)
 
-    def _parse_xml_var(self, xml_var):
-        dataset = xml_var.get("files").lower()
-        variable = xml_var.get("ID").lower()
+    def _parse_xml_var(self, xml_var: etree._Element) -> None:
+        dataset = xml_var.get("files")
+        variable = xml_var.get("ID")
         var_dict = OrderedDict()
         var_dict["study"] = self.study_name
-        var_dict["name"] = variable
-        var_dict["name_cs"] = xml_var.get("ID")
-        var_dict["variable"] = variable
         var_dict["dataset"] = dataset
+        var_dict["name"] = variable
         var_dict["label"] = xml_var.findtext("labl", default="")
         var_dict["categories"] = self._get_categories(xml_var)
         var_dict["statistics"] = self._get_statistics(xml_var)
@@ -93,43 +74,25 @@ class Parser:
             var_dict["scale"] = "cat"
         else:
             var_dict["scale"] = ""
-        if not dataset in self.datasets.keys():
-            self.datasets[dataset] = OrderedDict()
-        if self.datasets_csv is not None:
-            self._parse_dataset(var_dict)
+        if dataset not in self.datasets:
+            self.datasets[dataset] = {}
         self.datasets[dataset][variable] = var_dict
 
-    def _parse_dataset(self, var_dict):
-        try:
-            d = self.datasets_csv.ix[
-                self.datasets_csv.dataset_name == var_dict["dataset"]
-            ].iloc[0]
-            var_dict["analysis_unit"] = str(d.get("analysis_unit_name"))
-            var_dict["sub_type"] = str(d.get("conceptual_dataset_name"))
-            var_dict["boost"] = str(d.get("boost", "1"))
-            try:
-                var_dict["period"] = "%.0f" % d.get("period_name")
-            except:
-                var_dict["period"] = str(d.get("period_name"))
-        except:
-            pass
-
-    def _variable_translation(self, xml_var, language):
-        dataset = xml_var.get("files").lower()
-        variable = xml_var.get("ID").lower()
-        label = "label_%s" % language
-        labels = "labels_%s" % language
+    def _variable_translation(self, xml_var: etree._Element, language: str) -> None:
+        dataset = xml_var.get("files")
+        variable = xml_var.get("ID")
+        label = f"label_{language}"
+        labels = f"labels_{language}"
         self.datasets[dataset][variable][label] = xml_var.findtext("labl", default="")
         self.datasets[dataset][variable]["categories"][labels] = self._get_categories(
             xml_var
         )["labels"]
 
-    def _get_categories(self, xml_var):
-        result = OrderedDict()
-        result["frequencies"] = []
-        result["labels"] = []
-        result["missings"] = []
-        result["values"] = []
+    def _get_categories(self, xml_var: etree._Element) -> Dict:
+        frequencies = []
+        labels = []
+        missings = []
+        values = []
         int_cats = []
         str_cats = []
         for xml_cat in xml_var.findall("catgry"):
@@ -146,42 +109,50 @@ class Parser:
         ]
         for xml_cat in xml_cats:
             try:
-                result["frequencies"].append(int(xml_cat.findtext("catStat")))
+                cat_stat = int(xml_cat.findtext("catStat"))
             except:
-                result["frequencies"].append(int(0))
+                cat_stat = 0
+            frequencies.append(cat_stat)
             if xml_cat.get("missing", "").lower() == "true":
-                result["missings"].append(True)
+                missings.append(True)
             else:
-                result["missings"].append(False)
-            value = xml_cat.findtext("catValu")
-            result["values"].append(value.strip())
+                missings.append(False)
+            value = xml_cat.findtext("catValu").strip()
+            values.append(value)
             label = xml_cat.findtext("labl")
             if label:
-                result["labels"].append(label)
+                labels.append(label)
             else:
-                result["labels"].append(value)
-        return result
+                labels.append(value)
 
-    def _get_statistics(self, xml_var):
-        result = OrderedDict()
-        result["names"] = []
-        result["values"] = []
+        # use pandas to sort those lists based on "values"
+        sorting_dataframe = pd.DataFrame(
+            {
+                "values": values,
+                "labels": labels,
+                "missings": missings,
+                "frequencies": frequencies,
+            }
+        )
+        sorting_dataframe["labels"] = sorting_dataframe["labels"].astype(str)
+        sorting_dataframe["values"] = pd.to_numeric(sorting_dataframe["values"])
+        sorting_dataframe.sort_values(by="values", inplace=True)
+        return sorting_dataframe.to_dict("list")
+
+    def _get_statistics(self, xml_var: etree._Element) -> OrderedDict:
+        statistics = OrderedDict()
         for xml_stat in xml_var.findall("sumStat"):
-            result["names"].append(xml_stat.get("type"))
-            result["values"].append(xml_stat.text.strip())
-        return result
+            _type = xml_stat.get("type")
+            value = xml_stat.text.strip()
+            if "." in value:
+                value = float(value)
+            else:
+                value = int(value)
+            statistics[_type] = value
+        return statistics
 
-    def write_json(self):
+    def write_json(self) -> None:
         os.system("rm -r ddionrails/datasets; mkdir -p ddionrails/datasets")
         for dataset_name, dataset in self.datasets.items():
-            with open("ddionrails/datasets/%s.json" % dataset_name, "w") as f:
-                json.dump(dataset, f, indent=2)
-
-    def write_yaml(self):
-        os.system("rm -r temp/datasets; mkdir -p temp/datasets")
-        for dataset_name, dataset in self.datasets.items():
-            with open("temp/datasets/%s.yaml" % dataset_name, "w") as f:
-                yaml.dump(dataset, f, default_flow_style=False)
-
-    def _read_datasets_csv(self, path):
-        self.datasets_csv = pd.read_csv(path)
+            with open(f"ddionrails/datasets/{dataset_name}.json", "w") as outfile:
+                json.dump(list(dataset.values()), outfile, indent=2)
