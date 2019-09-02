@@ -144,8 +144,10 @@ class Parser:
         for xml_stat in xml_var.findall("sumStat"):
             _type = xml_stat.get("type")
             value = xml_stat.text.strip()
+            if value in ("NA", "NaN"):
+                value = None
             # float or scientific notation, e.g. 1e+05
-            if "." in value or "+" in value:
+            elif "." in value or "+" in value:
                 value = float(value)
             else:
                 value = int(value)
