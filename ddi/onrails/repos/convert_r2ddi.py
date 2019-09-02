@@ -2,6 +2,7 @@ import glob
 import json
 import os
 import re
+import sys
 from collections import OrderedDict
 from typing import Dict
 
@@ -9,6 +10,7 @@ import pandas as pd
 from lxml import etree
 
 LANG_RE = re.compile(r"(\w{2})/[\w\d\-_]+.xml$", flags=re.IGNORECASE)
+INT_MIN = -sys.maxsize - 1
 
 
 class Parser:
@@ -100,7 +102,7 @@ class Parser:
             try:
                 v = int(value)
                 int_cats.append((v, xml_cat))
-            except:
+            except ValueError:
                 str_cats.append((value, xml_cat))
         xml_cats = [
             x[1]
@@ -118,8 +120,15 @@ class Parser:
             else:
                 missings.append(False)
             value = xml_cat.findtext("catValu").strip()
-            values.append(value)
             label = xml_cat.findtext("labl")
+            # handle "system missings"
+            # TODO. handle ".a" - ".z"
+            if value == ".":
+                # set value to the smallest number Python knows.
+                # ensures this gets sorted to the end of other missing values.
+                value = INT_MIN
+                label = value
+            values.append(value)
             if label:
                 labels.append(label)
             else:
